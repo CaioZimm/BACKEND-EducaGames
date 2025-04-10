@@ -14,23 +14,20 @@ return new class extends Migration
         Schema::create('user', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('role', ['user', 'admin'])->default('user');
+            $table->string('nickname')->unique();
+            $table->enum('role', ['super_admin', 'user', 'admin'])->default('user');
             $table->string('password');
-            $table->unsignedBigInteger('avatar_id');
             $table->unsignedBigInteger('foundation_id');
+            $table->unsignedBigInteger('avatar_id');
             $table->softDeletes('deleted_at');
-            $table->rememberToken();
             $table->timestamps();
-
-            // Relation about tables;
-            // $table->foreign('avatar_id')->references('id')->on('avatar');
-            // $table->foreign('foundation_id')->references('id')->on('foundation');
+            $table->rememberToken();
         });
 
-        // Schema::create('avatar', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('url')->comment('Avatares do usuário');
-        // });
+        Schema::create('avatar', function (Blueprint $table) {
+            $table->id();
+            $table->string('url')->comment('Avatares do usuário');
+        });
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
@@ -48,7 +45,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('user');
-        // Schema::dropIfExists('avatar');
+        Schema::dropIfExists('avatar');
         Schema::dropIfExists('sessions');
     }
 };
