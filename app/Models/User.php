@@ -4,13 +4,14 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -19,9 +20,25 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
+        'nickname',
+        'role',
         'password',
+        'foundation_id',
+        'avatar_id'
     ];
+
+    public function foundation(){
+        return $this->belongsTo(Foundation::class); // UM usuário pertence à UMA Instituição;
+    }
+    public function avatar(){
+        return $this->belongsTo(Avatar::class); // UM usuário pode ter UM avatar;
+    }
+    public function answer(){
+        return $this->hasMany(Answer::class); // UM usuario pode ter VÁRIAS respostas;
+    }
+    public function result(){
+        return $this->hasMany(Result::class); // UM usuario pode ter VÁRIOS resultados de jogos;
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -41,7 +58,6 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
