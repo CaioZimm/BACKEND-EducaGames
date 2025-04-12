@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +23,12 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nickname' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:4'],
+            'name' => ['required', 'string', 'max:255'],
+            'nickname' => ['required', 'string', 'unique:'.User::class],
+            'role' => ['in:super_admin,admin,user'],
+            'password' => ['required', 'confirmed', 'min:4'],
+            'foundation_id' => ['nullable', 'exists:foundation,id'],
+            'avatar_id' => ['nullable', 'exists:avatar,id']
         ];
     }
 }
