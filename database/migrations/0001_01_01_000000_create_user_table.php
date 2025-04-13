@@ -27,6 +27,7 @@ return new class extends Migration
         Schema::create('avatar', function (Blueprint $table) {
             $table->id();
             $table->string('url')->comment('Avatares do usuário');
+            $table->timestamps();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
