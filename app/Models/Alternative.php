@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Alternative extends Model
 {
     use HasFactory;
+    protected $table = 'alternative';
 
     protected $fillable = [
         'description',

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Foundation extends Model
 {
     use HasFactory, SoftDeletes;
+    protected $table = 'foundation';
 
     protected $fillable = [
         'name',
