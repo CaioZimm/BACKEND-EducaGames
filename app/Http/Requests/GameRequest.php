@@ -27,7 +27,6 @@ class GameRequest extends FormRequest
             'mode' => ['in:competitive,casual'],
             'closed_time' => ['nullable', 'date'],
             'password' => ['nullable', 'string'],
-            'max_score' => ['nullable'],
             'foundation_id' => ['required', 'exists:foundation,id']
         ];
     }

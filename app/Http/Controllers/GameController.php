@@ -31,8 +31,7 @@ class GameController extends Controller
             'mode' => $request->input('mode'),
             'closed_time' => $request->closed_time,
             'password' => $request->password,
-            'max_score' => $request->max_score,
-            'foundation_id' => Auth::user()?->foundation_id ?? $request->foundation_id,
+            'foundation_id' => Auth::user()?->foundation_id ?? $request->foundation_id
         ]);
 
         return response()->json( [ 'message' => 'Game created successfully', 'data' => $game ], Response::HTTP_CREATED);
@@ -42,7 +41,7 @@ class GameController extends Controller
      * Display the specified resource.
      */
     public function show($id){
-        $game = Game::find($id);
+        $game = Game::with('question')->find($id);
 
         if(!$game){
             return response()->json([ 'message' => 'Game not found' ], Response::HTTP_NOT_FOUND);
@@ -60,8 +59,7 @@ class GameController extends Controller
             'description' => ['nullable', 'string', 'max:255'],
             'mode' => ['nullable', 'in:competitive,casual'],
             'closed_time' => ['nullable', 'date'],
-            'password' => ['nullable', 'string'],
-            'max_score' => ['nullable'],
+            'password' => ['nullable', 'string']
         ]);
 
         $game = Game::find($id);
@@ -75,8 +73,7 @@ class GameController extends Controller
             'description' => $request->description ?: $game->description,
             'mode' => $request->mode ?: $game->mode,
             'closed_time' => $request->closed_time ?: $game->closed_time,
-            'password' => $request->password ?: $game->password,
-            'max_score' => $request->max_score ?: $game->max_score
+            'password' => $request->password ?: $game->password
         ]);
 
         return response()->json( [ 'message' => 'Game updated successfully', 'data' => $game ], Response::HTTP_OK);
