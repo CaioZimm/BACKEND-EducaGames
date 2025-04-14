@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('type', ['open', 'mult']);
             $table->integer('score');
             $table->unsignedBigInteger('game_id');
+            $table->timestamps();
             $table->softDeletes('deleted_at');
 
             // Relation about Game Table;
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->string('description');
             $table->enum('is_correct', ['true', 'false']);
             $table->unsignedBigInteger('question_id');
+            $table->timestamps();
 
             // Relation about Question Table;
             $table->foreign('question_id')->references('id')->on('question');
@@ -40,6 +42,7 @@ return new class extends Migration
             $table->unsignedBigInteger('alternative_id')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('question_id');
+            $table->timestamps();
 
             // Relations about Option, Question, User Tables;
             $table->foreign('alternative_id')->references('id')->on('alternative');
