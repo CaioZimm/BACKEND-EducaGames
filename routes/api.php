@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\AlternativeController;
+use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AvatarController;
 use App\Http\Controllers\FoundationController;
 use App\Http\Controllers\GameController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\QuestionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -60,4 +63,37 @@ Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group( function (
     Route::put('/game/{id}', [GameController::class, 'update']);
 
     Route::delete('/game/{id}', [GameController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group( function (){
+    Route::post('/question', [QuestionController::class, 'store']);
+
+    Route::get('/question', [QuestionController::class, 'index']);
+    Route::get('/question/{id}', [QuestionController::class, 'show']);
+
+    Route::put('/question/{id}', [QuestionController::class, 'update']);
+
+    Route::delete('/question/{id}', [QuestionController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group( function(){
+    // Respostas - Dissertativas
+    Route::post('/answer', [AnswerController::class, 'store']);
+
+    Route::get('/answer', [AnswerController::class, 'index']);
+    Route::get('/answer/{id}', [AnswerController::class, 'show']);
+
+    Route::put('/answer/{id}', [AnswerController::class, 'update']);
+
+    Route::delete('/answer/{id}', [AnswerController::class, 'destroy']);
+
+    // Respostas - Alternativas
+    Route::post('/alternative', [AlternativeController::class, 'store']);
+
+    Route::get('/alternative', [AlternativeController::class, 'index']);
+    Route::get('/alternative/{id}', [AlternativeController::class, 'show']);
+
+    Route::put('/alternative/{id}', [AlternativeController::class, 'update']);
+
+    Route::delete('/alternative/{id}', [AlternativeController::class, 'destroy']);
 });
