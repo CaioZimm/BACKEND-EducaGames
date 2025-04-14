@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Answer;
+use App\Models\Alternative;
 use Illuminate\Http\Request;
 use App\Http\Requests\AnswerRequest;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class AnswerController extends Controller
@@ -25,12 +25,29 @@ class AnswerController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(AnswerRequest $request){
+        $alternative_id = $request->alternative_id;
+        
+        if ($alternative_id) {
+            $alternative = Alternative::find($alternative_id);
+    
+            $description = $alternative->description;
+            $question_id = $alternative->question_id;
+            $is_correct = $alternative->is_correct;
+
+            if($is_correct === 'true'){
+                $is_correct = 'correct';
+            } 
+            elseif($is_correct === 'false'){
+                $is_correct = 'wrong';
+            }
+        }
+
         $answer = Answer::create([
-            'description' => $request->description,
-            'is_correct' => $request->input('is_correct', 'waiting'),
-            'alternative_id' => $request->alternative_id,
+            'description' => $request->description ?: $description,
+            'is_correct' => $is_correct ?: 'waiting',
+            'alternative_id' => $alternative_id,
             'user_id' => $request->user()->id,
-            'question_id' => $request->question_id
+            'question_id' => $request->question_id ?: $question_id,
         ]);
 
         return response()->json( [ 'message' => 'Answer created successfully', 'data' => $answer ], Response::HTTP_CREATED);

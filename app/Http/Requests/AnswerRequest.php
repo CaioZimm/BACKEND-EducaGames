@@ -22,11 +22,11 @@ class AnswerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'description' => ['required', 'string'],
+            'description' => ['required_without:alternative_id', 'nullable', 'string'],
             'is_correct' => ['in:waiting,correct,wrong,partially'],
             'alternative_id' => ['nullable', 'exists:alternative,id'],
             'user_id' => ['exists:user,id'],
-            'question_id' => ['required', 'exists:question,id']
+            'question_id' => ['required_without:alternative_id', 'exists:question,id']
         ];
     }
 }
