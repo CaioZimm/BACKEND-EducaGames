@@ -4,62 +4,88 @@ namespace App\Http\Controllers;
 
 use App\Models\Answer;
 use Illuminate\Http\Request;
+use App\Http\Requests\AnswerRequest;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class AnswerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
-    }
+    public function index(){
+        if(!Answer::first()){
+            return response()->json([ 'message' => "There aren't answers" ], Response::HTTP_NOT_FOUND);
+        }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json( [ 'data' => Answer::all() ], Response::HTTP_OK);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(AnswerRequest $request){
+        $answer = Answer::create([
+            'description' => $request->description,
+            'is_correct' => $request->input('is_correct', 'waiting'),
+            'alternative_id' => $request->alternative_id,
+            'user_id' => $request->user()->id,
+            'question_id' => $request->question_id
+        ]);
+
+        return response()->json( [ 'message' => 'Answer created successfully', 'data' => $answer ], Response::HTTP_CREATED);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Answer $answer)
-    {
-        //
-    }
+    public function show($id){
+        $answer = Answer::find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Answer $answer)
-    {
-        //
+        if(!$answer){
+            return response()->json([ 'message' => 'Answer not found' ], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json([ 'data' => $answer ], Response::HTTP_OK);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Answer $answer)
-    {
-        //
+    public function update(Request $request, $id){
+        $request->validate([
+            'description' => ['nullable', 'string'],
+            'is_correct' => ['in:waiting,correct,wrong,partially'],
+            'alternative_id' => ['nullable', 'exists:alternative,id'],
+        ]);
+
+        $answer = Answer::find($id);
+
+        if(!$answer){
+            return response()->json([ 'message' => 'Answer not found' ], Response::HTTP_NOT_FOUND);
+        }
+
+        $answer->update([
+            'description' => $request->description ?: $answer->description,
+            'is_correct' => $request->input('is_correct', 'waiting') ?: $answer->is_correct,
+            'alternative_id' => $request->alternative_id ?: $answer->alternative_id
+        ]);
+
+        return response()->json( [ 'message' => 'Answer updated successfully', 'data' => $answer ], Response::HTTP_OK);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Answer $answer)
-    {
-        //
+    public function destroy($id){
+        $answer = Answer::find($id);
+
+        if(!$answer){
+            return response()->json([ 'message' => 'Answer not found' ], Response::HTTP_NOT_FOUND);
+        }
+
+        $answer->delete();
+
+        return response()->json( [ 'message' => 'Answer deleted successfully' ], Response::HTTP_OK);
     }
 }
