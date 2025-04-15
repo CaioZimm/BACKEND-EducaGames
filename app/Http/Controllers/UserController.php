@@ -93,7 +93,7 @@ class UserController extends Controller
      */
     public function destroy($id = null){
         if($id){
-            $user = User::findOrFail($id);
+            $user = User::find($id);
 
             if(!$user){
                 return response()->json(['message' => "User not found"], Response::HTTP_NOT_FOUND);

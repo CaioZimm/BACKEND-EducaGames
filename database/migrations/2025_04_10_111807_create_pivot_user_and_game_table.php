@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('result', function (Blueprint $table) {
             $table->id();
-            $table->decimal('your_score', 4,2);
+            $table->decimal('achieved_score', 4,2)->nullable();
             $table->unsignedBigInteger('game_id');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();

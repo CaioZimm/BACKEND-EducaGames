@@ -28,26 +28,15 @@ class AnswerController extends Controller
         $alternative_id = $request->alternative_id;
         
         if ($alternative_id) {
-            $alternative = Alternative::find($alternative_id);
-    
-            $description = $alternative->description;
-            $question_id = $alternative->question_id;
-            $is_correct = $alternative->is_correct;
-
-            if($is_correct === 'true'){
-                $is_correct = 'correct';
-            } 
-            elseif($is_correct === 'false'){
-                $is_correct = 'wrong';
-            }
+            $alternative = $this->alternativeAnswer($alternative_id);
         }
 
         $answer = Answer::create([
-            'description' => $request->description ?: $description,
-            'is_correct' => $is_correct ?: 'waiting',
+            'description' => $request->description ?: $alternative['description'],
+            'is_correct' => $alternative['is_correct'] ?: 'waiting',
             'alternative_id' => $alternative_id,
             'user_id' => $request->user()->id,
-            'question_id' => $request->question_id ?: $question_id,
+            'question_id' => $request->question_id ?: $alternative['question_id']
         ]);
 
         return response()->json( [ 'message' => 'Answer created successfully', 'data' => $answer ], Response::HTTP_CREATED);
@@ -82,9 +71,21 @@ class AnswerController extends Controller
             return response()->json([ 'message' => 'Answer not found' ], Response::HTTP_NOT_FOUND);
         }
 
+        $alternative_id = $request->alternative_id;
+        
+        if ($alternative_id) {
+            $alternative = $this->alternativeAnswer($alternative_id);
+
+            $answer->update([
+                'description' => $request->description ?: $alternative['description'],
+                'is_correct' => $alternative['is_correct'] ?: 'waiting',
+                'alternative_id' => $alternative_id
+            ]);
+        }
+
         $answer->update([
             'description' => $request->description ?: $answer->description,
-            'is_correct' => $request->input('is_correct', 'waiting') ?: $answer->is_correct,
+            'is_correct' => $request->input('is_correct') ?: $answer->is_correct,
             'alternative_id' => $request->alternative_id ?: $answer->alternative_id
         ]);
 
@@ -104,5 +105,23 @@ class AnswerController extends Controller
         $answer->delete();
 
         return response()->json( [ 'message' => 'Answer deleted successfully' ], Response::HTTP_OK);
+    }
+
+    private function alternativeAnswer($alternative_id){
+        $alternative = Alternative::find($alternative_id);
+ 
+        $is_correct = $alternative->is_correct;
+        if($is_correct === 'true'){
+            $is_correct = 'correct';
+        } 
+        elseif($is_correct === 'false'){
+            $is_correct = 'wrong';
+        }
+
+        return [
+            'description' => $alternative->description,
+            'question_id' => $alternative->question_id,
+            'is_correct' => $is_correct
+        ];
     }
 }

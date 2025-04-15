@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Game;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use App\Http\Requests\QuestionRequest;
-use App\Models\Game;
 use Symfony\Component\HttpFoundation\Response;
 
 class QuestionController extends Controller
@@ -32,14 +32,8 @@ class QuestionController extends Controller
             'game_id' => $request->game_id
         ]);
 
-        $game = $request->game_id;
-
-        if($game){
-            $game = Game::find($game);
-
-            if($game->mode === 'competitive'){
-                $this->sumMaxScore($game->id);
-            }
+        if($request->game_id){
+            $this->sumMaxScore($request->game_id);
         }
         
         return response()->json( [ 'message' => 'Question created successfully', 'data' => $question ], Response::HTTP_CREATED);
@@ -80,6 +74,8 @@ class QuestionController extends Controller
             'score' => $request->score ?: $question->score
         ]);
 
+        $this->sumMaxScore($question->game_id);
+
         return response()->json( [ 'message' => 'Game updated successfully', 'data' => $question ], Response::HTTP_OK);
     }
 
@@ -102,7 +98,7 @@ class QuestionController extends Controller
     private function sumMaxScore($game){
         $game = Game::with('question')->find($game);
 
-        if($game){
+        if($game->mode === 'competitive'){
             $total = $game->question->sum('score');
 
             $game->update([
