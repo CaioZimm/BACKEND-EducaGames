@@ -25,18 +25,22 @@ class AnswerController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(AnswerRequest $request){
-        $alternative_id = $request->alternative_id;
+        $alternative = $request->alternative_id ? $this->alternativeAnswer($request->alternative_id) : null;
+        $question_id = $request->question_id ?? $alternative['question_id'];
         
-        if ($alternative_id) {
-            $alternative = $this->alternativeAnswer($alternative_id);
+        $answered = Answer::where('question_id', $question_id)
+                            ->where('user_id', $request->user()->id)->exists();
+
+        if($answered){
+            return response()->json( [ 'message' => 'Questão já respondida' ], Response::HTTP_CONFLICT);
         }
 
         $answer = Answer::create([
             'description' => $request->description ?: $alternative['description'],
-            'is_correct' => $alternative['is_correct'] ?: 'waiting',
-            'alternative_id' => $alternative_id,
+            'is_correct' => $alternative['is_correct'] ?? 'waiting',
+            'alternative_id' => $request->alternative_id,
             'user_id' => $request->user()->id,
-            'question_id' => $request->question_id ?: $alternative['question_id']
+            'question_id' => $request->question_id ?? $alternative['question_id']
         ]);
 
         return response()->json( [ 'message' => 'Answer created successfully', 'data' => $answer ], Response::HTTP_CREATED);
