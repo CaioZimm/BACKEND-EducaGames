@@ -97,3 +97,7 @@ Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group( function()
 
     Route::delete('/alternative/{id}', [AlternativeController::class, 'destroy']);
 });
+
+Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group( function(){
+    Route::post('/result', [GameController::class, 'finish']);
+});

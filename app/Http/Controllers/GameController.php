@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use Illuminate\Http\Request;
+use App\Services\ResultService;
 use App\Http\Requests\GameRequest;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class GameController extends Controller
@@ -31,7 +31,7 @@ class GameController extends Controller
             'mode' => $request->input('mode'),
             'closed_time' => $request->closed_time,
             'password' => $request->password,
-            'foundation_id' => Auth::user()?->foundation_id ?? $request->foundation_id
+            'foundation_id' => $request->user()->foundation_id ?: $request->foundation_id
         ]);
 
         return response()->json( [ 'message' => 'Game created successfully', 'data' => $game ], Response::HTTP_CREATED);
@@ -41,7 +41,7 @@ class GameController extends Controller
      * Display the specified resource.
      */
     public function show($id){
-        $game = Game::with('question')->find($id);
+        $game = Game::with('question')->withCount('question')->find($id);
 
         if(!$game){
             return response()->json([ 'message' => 'Game not found' ], Response::HTTP_NOT_FOUND);
@@ -92,5 +92,17 @@ class GameController extends Controller
         $game->delete();
 
         return response()->json( [ 'message' => 'Game deleted successfully' ], Response::HTTP_OK);
+    }
+
+    public function finish(Request $request, ResultService $resultService){
+        $data = $request->validate([
+            'game_id' => ['required', 'exists:game,id'],
+            'answers' => ['array']
+        ]);
+        $data['user_id'] = $request->user()->id;
+
+        $result = $resultService->resultUser($data);
+
+        return response()->json([ 'data' => $result ]);
     }
 }

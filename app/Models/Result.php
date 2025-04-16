@@ -11,7 +11,7 @@ class Result extends Model
     protected $table = 'result';
 
     protected $fillable = [
-        'your_score',
+        'achieved_score',
         'game_id',
         'user_id'
     ];

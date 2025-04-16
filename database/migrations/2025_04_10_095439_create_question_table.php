@@ -42,6 +42,7 @@ return new class extends Migration
             $table->unsignedBigInteger('alternative_id')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('question_id');
+            $table->unique(['user_id', 'question_id']);
             $table->timestamps();
 
             // Relations about Option, Question, User Tables;
