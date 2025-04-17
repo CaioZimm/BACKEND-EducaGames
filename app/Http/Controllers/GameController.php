@@ -35,13 +35,23 @@ class GameController extends Controller
         ]);
 
         return response()->json( [ 'message' => 'Game created successfully', 'data' => $game ], Response::HTTP_CREATED);
-    }
+    } 
 
     /**
      * Display the specified resource.
      */
-    public function show($id){
-        $game = Game::with('question')->withCount('question')->find($id);
+    public function show($id, Request $request){
+        $isUserPlaying = $request['play'] ?: null;
+
+        $game = Game::withCount('question');
+
+        if($isUserPlaying){
+            $game = $game->with(['question' => function ($query){
+                $query->with('alternative');
+            }]);
+        }
+
+        $game = $game->find($id);
 
         if(!$game){
             return response()->json([ 'message' => 'Game not found' ], Response::HTTP_NOT_FOUND);
